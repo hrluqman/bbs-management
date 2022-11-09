@@ -1,19 +1,54 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import BBSRegisterView from '../views/bbs/BBSRegisterView.vue'
+import BBSListView from '../views/bbs/BBSListView.vue'
+import BBSDetailView from '../views/bbs/BBSDetailView.vue'
+import BBSModifyView from '../views/bbs/BBSModifyView.vue'
+import MemberRegisterView from '../views/member/MemberRegisterView.vue'
+import MemberListView from '../views/member/MemberListView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: BBSListView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/bbs/register',
+    name: 'bbs-register',
+    component: BBSRegisterView
+  },
+  {
+    path: '/bbs/list',
+    name: 'bbs-list',
+    component: BBSListView
+  },
+  {
+    path: '/bbs/view/:id',
+    name: 'bbs-view',
+    component: BBSDetailView,
+    props: true
+  },
+  {
+    path: '/bbs/modify/:id',
+    name: 'bbs-modify',
+    component: BBSModifyView,
+    props: true
+  },
+  {
+    path: '/member/register',
+    name: 'member-register',
+    component: MemberRegisterView
+  },
+  {
+    path: '/member/list',
+    name: 'member-list',
+    component: MemberListView
+  },
+  {
+    path: '/:catchAll(.*)',
+    name: 'not-found',
+    component: NotFoundView
   }
 ]
 

@@ -1,0 +1,199 @@
+@import "mixins";
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, p {
+    color: $black;
+}
+
+.bbs-navbar {
+    position: fixed;
+    background-color: white;
+    width: 100%;
+    z-index: 1;
+    height: 64px;
+    @include flex-row-aligncenter;
+    justify-content: space-between;
+    box-shadow: 0px 0px 1px rgb(0 0 0 / 4%), 0px 0px 2px rgb(0 0 0 / 6%), 0px 4px 8px rgb(0 0 0 / 4%);
+    -webkit-box-shadow: 0px 0px 1px rgb(0 0 0 / 4%), 0px 0px 2px rgb(0 0 0 / 6%), 0px 4px 8px rgb(0 0 0 / 4%);
+    h1 {
+        margin: 0;
+        color: $black;
+        font-size: 2rem;
+        font-weight: 700;
+        padding-inline: 1rem;
+        font-family: 'Merriweather Sans', sans-serif;
+    }
+}
+
+main {
+    @include flex-row-aligncenter;
+    align-items: flex-start;
+    height: 100vh;
+}
+
+.menu-container {
+    top: 0;
+    width: 25%;
+    height: 100%;
+    max-width: 300px;
+    padding-top: 70px;
+    font-size: 0.65em;
+    background-color: $primary;
+    .menu-content {
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+        color: white;
+        label {
+            width: 100%;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-align: left;
+        }
+        ul li {
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+        }
+        ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        ul li::marker {
+            content: "▹";
+        }
+    }
+}
+
+.form-container {
+    width: 75%;
+    padding-top: 70px;
+    margin: 1rem 1rem 0 1rem;
+    h1 {
+        text-align: left;
+    }
+    .input-container {
+        margin-bottom: 1rem;
+        @include flex-row-aligncenter;
+        justify-content: flex-start;
+        label {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            width: 100px;
+            margin-right: 1rem;
+        }
+        input:not(.btn-file), textarea {
+            margin: 0;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: $fade;
+        }
+        input:focus-visible, textarea:focus-visible {
+            outline: $primary auto 1px;
+        }
+        input[type="file"] {
+            background: none;
+            padding-left: 0;
+        }
+        /*custom input file*/
+        .custom-file-input {
+            color: transparent;
+        }
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+        .custom-file-input::before {
+            content: "Upload File";
+            color: white;
+            display: inline-block;
+            background: $primary;
+            padding: 10px 22px;
+            outline: none;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            cursor: pointer;
+            font-weight: 400;
+            margin-right: -4rem;
+            border-radius: 6px;
+            outline: none;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+        }
+        .custom-file-input:focus {
+            outline: none !important;
+        
+        }
+        .custom-file-input:active::before {
+            transform: scale(.9) translate(0px, 2px);
+            box-shadow:  inset 4px 4px 5px 0px rgba(0, 0, 0, 0.20);
+        }
+        .file-name span .delete {
+            font-size: 9px;
+            color: $primary;
+            padding: 1px 4px;
+            border-radius: 1rem;
+            border: 1px solid $primary;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+    }
+    .confirm-container {
+        margin-top: 1rem;
+        @include flex-row-aligncenter;
+        justify-content: flex-end;
+        .btn {
+            width: 5rem;
+            margin-inline: 0.5rem;
+            font-size: 1rem;
+            background-color: $primary;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            a {
+                color: white;
+                text-decoration: none;
+            }
+        }
+    }
+    .table tbody tr td a {
+        color: $primary;
+    }
+    .empty-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 1rem auto;
+        img {
+            width: 40%;
+            max-width: 15rem;
+            margin: 2rem auto;
+        }
+        p {
+            font-family: 'Montserrat', sans-serif;
+        }
+    } 
+}
+
+// Overwrite
+nav ul.pagination {
+    justify-content: flex-end;
+}
+.page-item:not(.active) .page-link {
+    color: $primary!important;
+}
+.page-item.active .page-link {
+    background-color: $primary;
+    border-color: $primary;
+}

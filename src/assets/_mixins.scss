@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@400;700&family=Montserrat:wght@400;600;700&display=swap');
+
+$primary: #26A9E0;
+$secondary: red;
+$black: rgba(0,0,0,0.8);
+$fade: #D9D9D9;
+
+@mixin flex-row-aligncenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
