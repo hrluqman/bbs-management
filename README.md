@@ -1,6 +1,6 @@
-# bbs-management
+# 📖  BBS Management
 
-## Project setup
+## 🚀 Project setup
 ```
 npm install
 ```
