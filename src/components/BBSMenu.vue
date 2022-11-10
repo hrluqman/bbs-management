@@ -1,6 +1,7 @@
 <template>
-    <div class="menu-container">
-        <div class="menu-content" v-for="menu in menus" :key="menu.menuName">
+    <div class="menu-container" :class="{openmenu : menuOpen}">
+        <img class="sidemenu-icon" src="../assets/menu.png" alt="menu" @click="openSideMenu">
+        <div class="menu-content" :class="{showmenu : menuOpen}" v-for="menu in menus" :key="menu.menuName">
             <label for="BBS">{{menu.menuName}}</label>
             <ul>
                 <li v-for="sub in menu.subMenus" :key="sub.menuName">&nbsp;<router-link :to="sub.url">{{ sub.menuName }}</router-link></li>
@@ -16,7 +17,14 @@ import { defineComponent } from 'vue'
 export default defineComponent({
     data() {
         return {
-            menus: []
+            menus: [],
+            menuOpen: false as boolean
+        }
+    },
+    methods: {
+        openSideMenu() {
+            console.log("OK");
+            this.menuOpen = !this.menuOpen;
         }
     },
     mounted() {
