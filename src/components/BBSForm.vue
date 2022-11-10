@@ -44,20 +44,38 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
-    data() {        
-        return {
-            id: this.$route.params.id,
-            title: '' as string,
-            content: '' as string | number,
-            selectedFile: [] as Array<object>,
-            modifyFile: [] as Array<object>
-        }
-    },
-    methods: {
-        onFileSelected(event:any) {
+    setup(props) {
+        const route = useRoute()
+        const router = useRouter()
+        const id = ref(route.params.id);
+        const title = ref('');
+        const content = ref('');
+        const selectedFile = ref([] as Array<object>);
+        const modifyFile = ref([] as Array<object>);
+
+        onMounted(async ()=> {
+            if(props.viewing || props.modify) {
+                //Load detail post
+                await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
+                .then(res=>res.json())
+                .then(data => {
+                    title.value = data.title;
+                    content.value = data.content;
+                    selectedFile.value = data.attachedFile.attachedFileInfos;
+                    selectedFile.value.forEach((element:any) => {
+                        //Create download link for file
+                        element['downloadLink'] = `http://public.flexink.com:9250/api/public/bbs/post/file/${data.id}/${data.attachedFile.id}/${element.id}?lang=en`;
+                    });
+                })
+                .catch(err=>alert(err.message))
+            }
+        })
+
+        const onFileSelected = (event:any) => {
             let files = {
                 id: Date.now(),
                 filename: event.target.files[0].name,
@@ -65,11 +83,11 @@ export default defineComponent({
                 contentType: event.target.files[0].type,
                 originalFilename: event.target.files[0].name,
             }
-            this.selectedFile.push(files);
+            selectedFile.value.push(files);
             //Remove duplicate
-            const unique = [...new Map(this.selectedFile.map((m:any) => [m.filename, m])).values()];
-            this.selectedFile = unique;        
-            if(this.modify) this.modifyFile.push(files);
+            const unique = [...new Map(selectedFile.value.map((m:any) => [m.filename, m])).values()];
+            selectedFile.value = unique;        
+            if(props.modify) modifyFile.value.push(files);
             
             // //Upload a File
             // fetch("http://idc.flexink.com:9250/api/public/bbs/post/file", {
@@ -78,12 +96,13 @@ export default defineComponent({
             // })
             // .then(res=>res.json)
             // .catch(err=>alert(err.message)); 
-        },
-        removeFile(id:number) {
-            if(this.modify) {
+        }
+
+        const removeFile = (id:number) => {
+            if(props.modify) {
                 let confirmRemove = confirm("Are you sure you want to permanently remove the picture?");
                 if(!confirmRemove) return;
-                this.selectedFile = this.selectedFile.filter(function (index:any){
+                selectedFile.value = selectedFile.value.filter(function (index:any){
                     return index.downloadLink !== id
                 });
                 if(id==undefined) return;
@@ -91,19 +110,20 @@ export default defineComponent({
                 fetch(URL, { method: 'DELETE' })
                 .catch(err=>alert(err.message));  
             }
-            this.selectedFile = this.selectedFile.filter(function (index:any){
+            selectedFile.value = selectedFile.value.filter(function (index:any){
                 return index.id !== id
             });
-        },
-        submitPost(e:Event) {
-            if(this.menu.includes('Member')) return;
-            if(this.title=='' || this.content=='') return;
+        }
+
+        const submitPost = async (e:Event) => {
+            if(props.menu.includes('Member')) return;
+            if(title.value=='' || content.value=='') return;
             e.preventDefault();
             var submitJson = {
-                title: this.title,
-                content: this.content,
+                title: title.value,
+                content: content.value,
                 attachedFile: {
-                    attachedFileInfos: this.selectedFile
+                    attachedFileInfos: selectedFile.value
                 }
             }
             //Register a post
@@ -112,32 +132,34 @@ export default defineComponent({
                 body: JSON.stringify(submitJson),
                 headers: { "Content-Type": "application/json; charset=UTF-8" }
             };
-            fetch("http://public.flexink.com:9250/api/public/bbs/post", requestOptions)
+            await fetch("http://public.flexink.com:9250/api/public/bbs/post", requestOptions)
             .then(()=>{
                 alert('Added Successfully!');
-                this.$router.push({ name: 'bbs-list' });
+                router.push({ name: 'bbs-list' });
             })
             .catch(err=>alert(err.message));            
-        },
-        deletePost(e:Event) {
+        }
+
+        const deletePost = async (e:Event) => {
             e.preventDefault();
             let confirmDelete = confirm("Are you sure you want to permanently delete the post?");
             if(!confirmDelete) return;
             //Delete a post
-            fetch(`http://public.flexink.com:9250/api/public/bbs/post/${this.id}`, { method: 'DELETE' })
+            await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, { method: 'DELETE' })
             .then(() => {
                 alert('Deleted Successfully!');
-                this.$router.push({ name: 'bbs-list' });
+                router.push({ name: 'bbs-list' });
             })
             .catch(err=>alert(err.message));            
-        },
-        modifyPost(e:Event) {
+        }
+
+        const modifyPost = async (e:Event) => {
             e.preventDefault();
             var submitJson = {
-                title: this.title,
-                content: this.content,
+                title: title.value,
+                content: content.value,
                 attachedFile: {
-                    attachedFileInfos: this.modifyFile
+                    attachedFileInfos: modifyFile.value
                 }
             }
             //Register a post
@@ -146,37 +168,15 @@ export default defineComponent({
                 headers: { "Content-Type": "application/json; charset=UTF-8" },
                 body: JSON.stringify(submitJson),
             };
-            fetch(`http://public.flexink.com:9250/api/public/bbs/post/${this.id}`, requestOptions)
+            await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, requestOptions)
             .then(()=>{
                 alert('Modified Successfully!');
-                this.$router.push({ name: 'bbs-view', params: { id: this.id} });
+                router.push({ name: 'bbs-view', params: { id: id.value} });
             })
             .catch(err=>alert(err.message));     
         }
-    },
-    mounted() {
-        if(this.viewing || this.modify) {
-            //Load detail post
-            fetch(`http://public.flexink.com:9250/api/public/bbs/post/${this.id}`)
-            .then(res=>res.json())
-            .then(data => {
-                this.title = data.title;
-                this.content = data.content;
-                this.selectedFile = data.attachedFile.attachedFileInfos;
-                // this.selectedFile.push({
-                //     id: data.attachedFile.attachedFileInfos.id,
-                //     filename: data.attachedFile.attachedFileInfos.,
-                //     fileSize: data.attachedFile.attachedFileInfos.,
-                //     contentType: data.attachedFile.attachedFileInfos.,
-                //     originalFilename: data.attachedFile.attachedFileInfos.,
-                // });
-                this.selectedFile.forEach((element:any) => {
-                    //Create download link for file
-                    element['downloadLink'] = `http://public.flexink.com:9250/api/public/bbs/post/file/${data.id}/${data.attachedFile.id}/${element.id}?lang=en`;
-                });
-            })
-            .catch(err=>alert(err.message))
-        }
+        
+        return { id, title, content, selectedFile, modifyFile, onFileSelected, removeFile, submitPost, deletePost, modifyPost }
     },
     props: ['menu', 'viewing', 'modify']
 })

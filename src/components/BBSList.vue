@@ -42,48 +42,55 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
-    data() {
-        return {
-            lists: [], 
-            currentPage: 1 as number,
-            totalPage: 10,
-            pagination: [1,2,3]
-        }
-    },
-    methods: {
-        init(page:string) {
+    setup() {
+        const route = useRoute()
+        const lists = ref([]);
+        const totalPage = ref(10);
+        const currentPage = ref(1);
+        const pagination = ref([1,2,3]);        
+
+        const init = async (page:string) => {
             //Load list of post
-            fetch(`http://public.flexink.com:9250/api/public/bbs/post${page}`)
-            .then(res=>res.json())
-            .then(data => {
-                this.lists = data.data;
-                this.totalPage = Math.ceil(data.count/10)
-            })
-            .catch(err=>alert(err.message))
-        },
-        getPage(page:number | string) {
-            if(page=='previous' && this.currentPage>1) this.currentPage--;
-            if(page=='next' && this.currentPage<this.totalPage) this.currentPage++;
-            if(page!=='previous' && page!=='next') this.currentPage = Number(page);
-            if(this.currentPage==this.pagination[this.pagination.length-1] && this.currentPage<this.totalPage) {
-                this.pagination.shift();
-                this.pagination.push(this.currentPage+1);
+            try {
+                let datas = await fetch(`http://public.flexink.com:9250/api/public/bbs/post${page}`);
+                if(!datas.ok) throw Error('No Data Available');
+                datas.json().then(data=>{
+                    lists.value = data.data;
+                    totalPage.value = Math.ceil(data.count/10)
+                });
             }
-            if(this.currentPage==this.pagination[0] && this.currentPage>1) {
-                this.pagination.pop();
-                this.pagination.unshift(this.currentPage-1);
+            catch (error) {
+                if (error instanceof Error) alert(error.message);
+                else alert(String(error));
             }
-            let pageParams = `?pageNumber=${this.currentPage}`; 
-            this.init(pageParams);
-        } 
-    },
-    mounted()  {
-        if(this.$route.fullPath == '/bbs/list' || this.$route.fullPath == '/') {
-            this.init('');
         }
+
+        const getPage = (page:number | string) => {
+            if(page=='previous' && currentPage.value>1) currentPage.value--;
+            if(page=='next' && currentPage.value<totalPage.value) currentPage.value++;
+            if(page!=='previous' && page!=='next') currentPage.value = Number(page);
+            if(currentPage.value==pagination.value[pagination.value.length-1] && currentPage.value<totalPage.value) {
+                pagination.value.shift();
+                pagination.value.push(currentPage.value+1);
+            }
+            if(currentPage.value==pagination.value[0] && currentPage.value>1) {
+                pagination.value.pop();
+                pagination.value.unshift(currentPage.value-1);
+            }
+            let pageParams = `?pageNumber=${currentPage.value}`; 
+            init(pageParams);
+        } 
+
+        onMounted(()=> {
+            if(route.fullPath == '/bbs/list' || route.fullPath == '/') init('');
+        })
+
+        return { lists, totalPage, currentPage, pagination, getPage }
+
     },
     props: ['menu']
 })

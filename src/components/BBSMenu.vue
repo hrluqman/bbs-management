@@ -12,26 +12,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 
 export default defineComponent({
-    data() {
-        return {
-            menus: [],
-            menuOpen: false as boolean
+    setup() {
+        const menus = ref([]);
+        const menuOpen = ref(false);
+
+        const openSideMenu = () => {
+            menuOpen.value = !menuOpen.value;
         }
-    },
-    methods: {
-        openSideMenu() {
-            console.log("OK");
-            this.menuOpen = !this.menuOpen;
+
+        const initMenu = async () => {
+            try {
+                let data = await fetch('http://public.flexink.com:9250/api/public/menu/hierarchy');
+                if(!data.ok) throw Error('No Data Available');
+                menus.value = await data.json();
+            }
+            catch (error) {
+                if (error instanceof Error) alert(error.message);
+                else alert(String(error));
+            }
         }
-    },
-    mounted() {
-        fetch('http://public.flexink.com:9250/api/public/menu/hierarchy')
-        .then(res => res.json())
-        .then(data => this.menus = data)
-        .catch(err=>alert(err.message))
+
+        onMounted(()=> initMenu())
+
+        return { menus, menuOpen, openSideMenu }
     }
 })
 </script>
