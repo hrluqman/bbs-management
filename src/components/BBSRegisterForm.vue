@@ -13,7 +13,7 @@
             <div class="input-container">
                 <label for="files" style="margin-right:0.5rem">Files</label>
                 <div>
-                    <input type="file" ref="fileInput" class="custom-file-input" @change="onFileSelected">
+                    <input type="file" class="custom-file-input" @change="onFileSelected">
                     <div class="file-name">
                         <span v-for="file of selectedFile" :key="file.id" style="margin-right: 10px">{{file.filename}}<span class="delete" @click="removeFile(file.id)">X</span></span>
                     </div>

@@ -36,9 +36,7 @@ export default defineComponent({
     setup() {
         const { id, title, content, selectedFile, init } = getForm('')
 
-        onMounted(async ()=> {
-            init()
-        })
+        onMounted(async ()=> init())
 
         return { id, title, content, selectedFile }
     },

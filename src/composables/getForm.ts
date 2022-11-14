@@ -1,4 +1,5 @@
 import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 import { ref } from 'vue'
 
 const getForm = (props:any) => {
@@ -7,14 +8,15 @@ const getForm = (props:any) => {
     const id = ref(route.params.id)
     const title = ref('')
     const content = ref('')
+    const fileInput = ref('')
     const selectedFile = ref([] as Array<object>)
     const modifyFile = ref([] as Array<object>)
 
     const init = async () => {
         //Load detail post
-        await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
-        .then(res=>res.json())
-        .then(data => {
+        await axios.get(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
+        .then(response => {
+            const data = response.data;
             title.value = data.title;
             content.value = data.content;
             data.attachedFile == null ? selectedFile.value = [] : selectedFile.value = data.attachedFile.attachedFileInfos;
@@ -40,16 +42,22 @@ const getForm = (props:any) => {
         selectedFile.value = unique;        
         if(props.modify) modifyFile.value.push(files);
         
-        // //Upload a File
-        // fetch("http://idc.flexink.com:9250/api/public/bbs/post/file", {
-        //     method: "POST",
-        //     body: event.target.files[0]
-        // })
-        // .then(res=>res.json)
-        // .catch(err=>alert(err.message)); 
+        //Upload a File
+        handleFileUpload(event);
     }
 
-    const removeFile = (id:number) => {
+    const handleFileUpload = (event:any) => {
+        fileInput.value = event.target.files[0];
+        const formData = new FormData();
+        formData.append('file', fileInput.value);
+        const headers = {'Content-Type': 'multipart/form-data'}
+        axios.post("http://public.flexink.com:9250/api/public/bbs/post/file", formData, { headers })
+        .catch(function(){
+            alert("Failed to upload file. Please try again later.");
+        });
+    }
+
+    const removeFile = async (id:number) => {
         if(props.modify) {
             const confirmRemove = confirm("Are you sure you want to permanently remove the picture?");
             if(!confirmRemove) return;
@@ -58,8 +66,7 @@ const getForm = (props:any) => {
             });
             if(id==undefined) return;
             const URL = id.toString().replace('?lang=en', '');
-            fetch(URL, { method: 'DELETE' })
-            .catch(err=>alert(err.message));  
+            await axios.delete(URL).catch(err=>alert(err.message));  
         }
         selectedFile.value = selectedFile.value.filter(function (index:any){
             return index.id !== id
@@ -78,12 +85,8 @@ const getForm = (props:any) => {
             }
         }
         //Register a post
-        const requestOptions = {
-            method: "POST",
-            body: JSON.stringify(submitJson),
-            headers: { "Content-Type": "application/json; charset=UTF-8" }
-        };
-        await fetch("http://public.flexink.com:9250/api/public/bbs/post", requestOptions)
+        const headers = { "Content-Type": "application/json; charset=UTF-8" };
+        await axios.post("http://public.flexink.com:9250/api/public/bbs/post", JSON.stringify(submitJson), { headers })
         .then(()=>{
             alert('Added Successfully!');
             router.push({ name: 'bbs-list' });
@@ -96,7 +99,7 @@ const getForm = (props:any) => {
         const confirmDelete = confirm("Are you sure you want to permanently delete the post?");
         if(!confirmDelete) return;
         //Delete a post
-        await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, { method: 'DELETE' })
+        await axios.delete(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
         .then(() => {
             alert('Deleted Successfully!');
             router.push({ name: 'bbs-list' });
@@ -113,13 +116,9 @@ const getForm = (props:any) => {
                 attachedFileInfos: modifyFile.value
             }
         }
-        //Register a post
-        const requestOptions = {
-            method: "PUT",
-            headers: { "Content-Type": "application/json; charset=UTF-8" },
-            body: JSON.stringify(submitJson),
-        };
-        await fetch(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, requestOptions)
+        //Modify a post
+        const headers = { "Content-Type": "application/json; charset=UTF-8" };
+        await axios.put(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, JSON.stringify(submitJson), { headers })
         .then(()=>{
             alert('Modified Successfully!');
             router.push({ name: 'bbs-view', params: { id: id.value} });
@@ -127,7 +126,7 @@ const getForm = (props:any) => {
         .catch(err=>alert(err.message));     
     }
 
-    return { id, title, content, selectedFile, modifyFile, init, onFileSelected, removeFile, submitPost, deletePost, modifyPost }
+    return { id, title, content, selectedFile, modifyFile, init, onFileSelected, removeFile, submitPost, deletePost, modifyPost, handleFileUpload }
 }
 
 export default getForm

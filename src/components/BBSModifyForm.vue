@@ -38,9 +38,7 @@ export default defineComponent({
     setup(props) {
         const { id, title, content, selectedFile, modifyFile, init, onFileSelected, removeFile, deletePost, modifyPost } = getForm(props)
 
-        onMounted(async ()=> {
-            init()
-        })
+        onMounted(async ()=> init())
         
         return { id, title, content, selectedFile, modifyFile, onFileSelected, removeFile, deletePost, modifyPost }
     },

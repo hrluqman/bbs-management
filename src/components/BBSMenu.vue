@@ -12,6 +12,7 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios';
 import { defineComponent, onMounted, ref } from 'vue'
 
 export default defineComponent({
@@ -25,9 +26,9 @@ export default defineComponent({
 
         const initMenu = async () => {
             try {
-                let data = await fetch('http://public.flexink.com:9250/api/public/menu/hierarchy');
-                if(!data.ok) throw Error('No Data Available');
-                menus.value = await data.json();
+                const data = await axios.get('http://public.flexink.com:9250/api/public/menu/hierarchy')
+                if(data.status!=200) throw Error('No Data Available');
+                menus.value = data.data;
             }
             catch (error) {
                 if (error instanceof Error) alert(error.message);
