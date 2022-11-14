@@ -28,30 +28,25 @@ const getForm = (props:any) => {
         .catch(err=>alert(err.message))
     }
 
-    const onFileSelected = (event:any) => {
-        const files = {
-            id: Date.now(),
-            filename: event.target.files[0].name,
-            fileSize: event.target.files[0].size,
-            contentType: event.target.files[0].type,
-            originalFilename: event.target.files[0].name,
-        }
-        selectedFile.value.push(files);
-        //Remove duplicate
-        const unique = [...new Map(selectedFile.value.map((m:any) => [m.filename, m])).values()];
-        selectedFile.value = unique;        
-        if(props.modify) modifyFile.value.push(files);
-        
-        //Upload a File
-        handleFileUpload(event);
-    }
-
-    const handleFileUpload = (event:any) => {
+    const onFileSelected = (event:any) => {       
         fileInput.value = event.target.files[0];
         const formData = new FormData();
         formData.append('file', fileInput.value);
         const headers = {'Content-Type': 'multipart/form-data'}
         axios.post("http://public.flexink.com:9250/api/public/bbs/post/file", formData, { headers })
+        .then(res=> {
+            const files = {
+                filename: res.data[0].filename,
+                fileSize: res.data[0].fileSize,
+                contentType: res.data[0].contentType,
+                originalFilename: res.data[0].originalFilename,
+            }
+            selectedFile.value.push(files);
+            //Remove duplicate
+            const unique = [...new Map(selectedFile.value.map((m:any) => [m.filename, m])).values()];
+            selectedFile.value = unique;        
+            if(props.modify) modifyFile.value.push(files);
+        })
         .catch(function(){
             alert("Failed to upload file. Please try again later.");
         });
@@ -126,7 +121,7 @@ const getForm = (props:any) => {
         .catch(err=>alert(err.message));     
     }
 
-    return { id, title, content, selectedFile, modifyFile, init, onFileSelected, removeFile, submitPost, deletePost, modifyPost, handleFileUpload }
+    return { id, title, content, selectedFile, modifyFile, init, onFileSelected, removeFile, submitPost, deletePost, modifyPost }
 }
 
 export default getForm

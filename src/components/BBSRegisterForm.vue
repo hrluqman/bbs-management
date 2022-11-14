@@ -15,7 +15,7 @@
                 <div>
                     <input type="file" class="custom-file-input" @change="onFileSelected">
                     <div class="file-name">
-                        <span v-for="file of selectedFile" :key="file.id" style="margin-right: 10px">{{file.filename}}<span class="delete" @click="removeFile(file.id)">X</span></span>
+                        <span v-for="file of selectedFile" :key="file.filename" style="margin-right: 10px">{{file.originalFilename}}<span class="delete" @click="removeFile(file.id)">X</span></span>
                     </div>
                 </div>
             </div>
