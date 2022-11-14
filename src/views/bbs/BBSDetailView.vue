@@ -2,7 +2,7 @@
   <BBSHeader />
   <main>
     <BBSMenu />
-    <BBSForm menu="BBS View" :viewing="viewing" />
+    <BBSViewForm menu="BBS View" :viewing="viewing" />
   </main>
 </template>
 
@@ -10,14 +10,14 @@
 import { defineComponent } from 'vue';
 import BBSHeader from '../../components/BBSHeader.vue';
 import BBSMenu from '../../components/BBSMenu.vue';
-import BBSForm from '../../components/BBSForm.vue';
+import BBSViewForm from '../../components/BBSViewForm.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     BBSHeader,
     BBSMenu,
-    BBSForm
+    BBSViewForm
   },
   data() {
     return {
