@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios';
 import { defineComponent, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -56,12 +57,10 @@ export default defineComponent({
         const init = async (page:string) => {
             //Load list of post
             try {
-                let datas = await fetch(`http://public.flexink.com:9250/api/public/bbs/post${page}`);
-                if(!datas.ok) throw Error('No Data Available');
-                datas.json().then(data=>{
-                    lists.value = data.data;
-                    totalPage.value = Math.ceil(data.count/10)
-                });
+                const data = await axios.get(`http://public.flexink.com:9250/api/public/bbs/post${page}`)
+                if(data.status!=200) throw Error('No Data Available');
+                lists.value = data.data.data;
+                totalPage.value = Math.ceil(data.data.count/10)
             }
             catch (error) {
                 if (error instanceof Error) alert(error.message);
