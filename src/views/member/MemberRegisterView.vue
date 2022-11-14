@@ -2,7 +2,7 @@
   <BBSHeader />
   <main>
     <BBSMenu />
-    <BBSForm menu="Member Register" />
+    <BBSRegisterForm menu="Member Register" />
   </main>
 </template>
 
@@ -10,14 +10,14 @@
 import { defineComponent } from 'vue';
 import BBSHeader from '../../components/BBSHeader.vue';
 import BBSMenu from '../../components/BBSMenu.vue';
-import BBSForm from '../../components/BBSForm.vue';
+import BBSRegisterForm from '../../components/BBSRegisterForm.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     BBSHeader,
     BBSMenu,
-    BBSForm
+    BBSRegisterForm
   }
 });
 </script>

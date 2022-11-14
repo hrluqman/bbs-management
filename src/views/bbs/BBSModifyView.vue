@@ -2,7 +2,7 @@
   <BBSHeader />
   <main>
     <BBSMenu />
-    <BBSForm menu="BBS Modify" :modify="modify" />
+    <BBSModifyForm menu="BBS Modify" :modify="modify" />
   </main>
 </template>
 
@@ -10,14 +10,14 @@
 import { defineComponent } from 'vue';
 import BBSHeader from '../../components/BBSHeader.vue';
 import BBSMenu from '../../components/BBSMenu.vue';
-import BBSForm from '../../components/BBSForm.vue';
+import BBSModifyForm from '../../components/BBSModifyForm.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     BBSHeader,
     BBSMenu,
-    BBSForm
+    BBSModifyForm
   },
   data() {
     return {
