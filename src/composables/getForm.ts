@@ -14,7 +14,7 @@ const getForm = (props:any) => {
 
     const init = async () => {
         //Load detail post
-        await axios.get(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
+        await axios.get(`${process.env.VUE_APP_SERVICE_URL}bbs/post/${id.value}`)
         .then(response => {
             const data = response.data;
             title.value = data.title;
@@ -22,7 +22,7 @@ const getForm = (props:any) => {
             data.attachedFile == null ? selectedFile.value = [] : selectedFile.value = data.attachedFile.attachedFileInfos;
             selectedFile.value.forEach((element:any) => {
                 //Create download link for file
-                element['downloadLink'] = `http://public.flexink.com:9250/api/public/bbs/post/file/${data.id}/${data.attachedFile.id}/${element.id}?lang=en`;
+                element['downloadLink'] = `${process.env.VUE_APP_SERVICE_URL}bbs/post/file/${data.id}/${data.attachedFile.id}/${element.id}?lang=en`;
             });
         })
         .catch(err=>alert(err.message))
@@ -33,7 +33,7 @@ const getForm = (props:any) => {
         const formData = new FormData();
         formData.append('file', fileInput.value);
         const headers = {'Content-Type': 'multipart/form-data'}
-        axios.post("http://public.flexink.com:9250/api/public/bbs/post/file", formData, { headers })
+        axios.post(`${process.env.VUE_APP_SERVICE_URL}bbs/post/file`, formData, { headers })
         .then(res=> {
             const files = {
                 filename: res.data[0].filename,
@@ -81,7 +81,7 @@ const getForm = (props:any) => {
         }
         //Register a post
         const headers = { "Content-Type": "application/json; charset=UTF-8" };
-        await axios.post("http://public.flexink.com:9250/api/public/bbs/post", JSON.stringify(submitJson), { headers })
+        await axios.post(`${process.env.VUE_APP_SERVICE_URL}bbs/post`, JSON.stringify(submitJson), { headers })
         .then(()=>{
             alert('Added Successfully!');
             router.push({ name: 'bbs-list' });
@@ -94,7 +94,7 @@ const getForm = (props:any) => {
         const confirmDelete = confirm("Are you sure you want to permanently delete the post?");
         if(!confirmDelete) return;
         //Delete a post
-        await axios.delete(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`)
+        await axios.delete(`${process.env.VUE_APP_SERVICE_URL}bbs/post/${id.value}`)
         .then(() => {
             alert('Deleted Successfully!');
             router.push({ name: 'bbs-list' });
@@ -113,7 +113,7 @@ const getForm = (props:any) => {
         }
         //Modify a post
         const headers = { "Content-Type": "application/json; charset=UTF-8" };
-        await axios.put(`http://public.flexink.com:9250/api/public/bbs/post/${id.value}`, JSON.stringify(submitJson), { headers })
+        await axios.put(`${process.env.VUE_APP_SERVICE_URL}bbs/post/${id.value}`, JSON.stringify(submitJson), { headers })
         .then(()=>{
             alert('Modified Successfully!');
             router.push({ name: 'bbs-view', params: { id: id.value} });

@@ -57,7 +57,7 @@ export default defineComponent({
         const init = async (page:string) => {
             //Load list of post
             try {
-                const data = await axios.get(`http://public.flexink.com:9250/api/public/bbs/post${page}`)
+                const data = await axios.get(`${process.env.VUE_APP_SERVICE_URL}bbs/post${page}`)
                 if(data.status!=200) throw Error('No Data Available');
                 lists.value = data.data.data;
                 totalPage.value = Math.ceil(data.data.count/10)

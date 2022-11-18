@@ -26,7 +26,7 @@ export default defineComponent({
 
         const initMenu = async () => {
             try {
-                const data = await axios.get('http://public.flexink.com:9250/api/public/menu/hierarchy')
+                const data = await axios.get(`${process.env.VUE_APP_SERVICE_URL}menu/hierarchy`)
                 if(data.status!=200) throw Error('No Data Available');
                 menus.value = data.data;
             }
